@@ -1,0 +1,16 @@
+services:
+  testApp:
+    image: "registry.hub.docker.com/mrelement/exmaples:1.0.0-SNAPSHOT"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:/home/db/local;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    ports:
+      - "8090:8080"
+    volumes:
+      - db-data:/home/db
+volumes:
+  db-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './db'

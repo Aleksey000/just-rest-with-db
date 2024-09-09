@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Собрать приложение в регистри registry.hub.docker.com
+mvn clean package -DskipTests jib:build \
+  -Ddocker.registry.login=ЛОГИН \
+  -Ddocker.registry.password=ПАРОЛЬ
