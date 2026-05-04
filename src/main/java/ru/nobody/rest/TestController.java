@@ -3,15 +3,20 @@ package ru.nobody.rest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import ru.nobody.auth.data.enums.Role;
 import ru.nobody.data.entity.DbData;
 import ru.nobody.data.repository.TestRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 public class TestController {
 
@@ -19,17 +24,55 @@ public class TestController {
     private TestRepository testRepository;
 
 
+
+
+
+
     @PostMapping("/put")
     public Answer putData(@RequestBody String data) {
         DbData dbData = new DbData();
         dbData.setData(data);
-        testRepository.save(dbData);
+        DbData save = testRepository.save(dbData);
         return Answer.builder().status(RestStatus.builder()
                         .result("OK")
                         .text("Чики-пуки")
                         .build())
+                .id(save.getId())
                 .build();
     }
+
+    @GetMapping("/get")
+    public GetDataResult get(
+            @RequestParam(value = "id", required = false)
+            String id
+    ) {
+        UUID uuid = null;
+        try {
+            uuid = UUID.fromString(id);
+        } catch (Exception ex) {
+            // ignore
+        }
+        log.info("id {}", uuid);
+
+
+        Optional<DbData> dataOptional = uuid == null ? Optional.empty() : testRepository.findById(uuid);
+
+        UUID finalUuid = uuid;
+        testRepository.findAll().forEach(item -> {
+            if (item.getId().equals(finalUuid)) {
+                log.info("FIND!!");
+            }
+        });
+
+        return GetDataResult.builder()
+                .status(RestStatus.builder()
+                        .result(dataOptional.isPresent() ? "OK" : "NOT_FOUNDED")
+                        .text(dataOptional.isPresent() ? "Чики-пуки" : "Я ничё не нашёл")
+                        .build())
+                .item(dataOptional.map(DbData::getData).orElse(null))
+                .build();
+    }
+
 
     @GetMapping("/list")
     public PutDataResult putData(
@@ -59,6 +102,7 @@ public class TestController {
     @Builder
     public static class Answer {
         private RestStatus status;
+        private UUID id;
     }
 
     @Data
@@ -75,5 +119,21 @@ public class TestController {
         private int page;
         private int pageSize;
         private List<String> list;
+    }
+
+    @Data
+    @Builder
+    public static class GetDataResult {
+        private RestStatus status;
+        private String item;
+    }
+
+    @Data
+    @Builder
+    public static class UserMeInfo {
+        private UUID id;
+        private String name;
+        private String email;
+        private Role role;
     }
 }

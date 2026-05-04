@@ -2,11 +2,30 @@ services:
   testApp:
     image: "registry.hub.docker.com/mrelement/exmaples:1.0.0-SNAPSHOT"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:h2:/home/db/local;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
     ports:
       - "8090:8080"
     volumes:
-      - db-data:/home/db
+      - db-data:/var/lib/postgresql/data/pgdata
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   db-data:
     driver: local
