@@ -17,11 +17,13 @@ public class CustomUserDetailsManager implements UserDetailsManager {
 
     private final UserRepository userRepository;
 
+    // TODO удалить и добавить просто в init
     @PostConstruct
     private void initAdmin() {
         if (userExists("admin")) {
             return;
         }
+        // TODO разобаться с криптографией
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         User user = new User();

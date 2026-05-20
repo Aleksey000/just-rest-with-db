@@ -17,6 +17,7 @@ import ru.nobody.services.UserService;
 
 import java.util.UUID;
 
+// TODO логи
 @Slf4j
 @RestController
 @RequestMapping("/v1/auth")

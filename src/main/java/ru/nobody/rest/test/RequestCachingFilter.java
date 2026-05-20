@@ -30,7 +30,7 @@
 //        CachedHttpServletRequest cachedHttpServletRequest = new CachedHttpServletRequest(request);
 //        log.info("REQUEST DATA:\n'{}'\n{} \n{}", request.getServletPath(), String.join("\n", getHeaders(request)), IOUtils.toString(cachedHttpServletRequest.getInputStream(), StandardCharsets.UTF_8));
 //        filterChain.doFilter(cachedHttpServletRequest, response);
-////        log.info("RESPONSE DATA:{}\n{}", response.getStatus(), String.join("\n", getHeaders(response)));
+//        log.info("RESPONSE DATA:{}\n{}", response.getStatus(), String.join("\n", getHeaders(response)));
 //    }
 //
 //    private List<String> getHeaders(HttpServletRequest request) {
@@ -64,7 +64,6 @@
 //            }
 //        }
 //
-//        ResponseWrapper responseWrapper = new ResponseWrapper(response);
 //
 //        return strings;
 //    }

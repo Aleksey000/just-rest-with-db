@@ -7,8 +7,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,6 +22,7 @@ public class Project {
     @Column(unique = true)
     private String name;
 
+    @EqualsAndHashCode.Exclude
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_member",

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -48,7 +47,7 @@ public class SecurityFilterConfig {
                 .cors(Customizer.withDefaults()) // TODO
                 .csrf(AbstractHttpConfigurer::disable) // TODO
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("**")
+                        .requestMatchers("/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -58,14 +57,10 @@ public class SecurityFilterConfig {
                         .permitAll()
                         .logoutSuccessHandler((req, response, auth) -> {
                             authenticationService.logoutUser(response);
-                            // TODO Разорбатиься почему спринг сам не прокидвает эти заголовки
-                            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, getHeader(req, HttpHeaders.ORIGIN));
-                            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS , "true");
                             response.setStatus(HttpStatus.OK.value());
                             response.getWriter().flush();
                         })
                 )
-//                        .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))))
                 .authenticationProvider(daoAuthenticationProvider)
                 .addFilterBefore(httpOnlyCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception ->

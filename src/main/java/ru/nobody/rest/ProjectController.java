@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO логи
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/project")

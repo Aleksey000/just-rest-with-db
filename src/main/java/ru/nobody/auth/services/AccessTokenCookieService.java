@@ -14,6 +14,9 @@ import static ru.nobody.auth.Constants.COOKIE_NAME;
 @Service
 public class AccessTokenCookieService {
 
+    /**
+     * Получаем JWT токен
+     */
     public Optional<Cookie> getAccessTokenCookie(final HttpServletRequest request) {
         return Arrays.stream(Optional.ofNullable(request.getCookies())
                         .orElse(new Cookie[]{}))
@@ -21,6 +24,9 @@ public class AccessTokenCookieService {
                 .findAny();
     }
 
+    /**
+     * Возвращаем куки с токеном
+     */
     public Cookie createHttpOnlyCookie(final String cookieValue) {
         requireNonNull(cookieValue);
 
@@ -33,6 +39,9 @@ public class AccessTokenCookieService {
         return cookie;
     }
 
+    /**
+     * Возвращаем куки с очищеным токеном
+     */
     public Cookie createBlankHttpOnlyCookie() {
         final var cookie = new Cookie(COOKIE_NAME, "");
         cookie.setHttpOnly(true);

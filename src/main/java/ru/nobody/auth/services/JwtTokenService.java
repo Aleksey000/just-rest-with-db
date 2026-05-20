@@ -22,11 +22,6 @@ import static ru.nobody.auth.Constants.TOKEN_SECRET;
 @Service
 public class JwtTokenService {
 
-    /**
-     *
-     * @param username
-     * @return
-     */
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
@@ -44,12 +39,6 @@ public class JwtTokenService {
                 .compact();
     }
 
-    /**
-     *
-     * @param token
-     * @param userDetails
-     * @return
-     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         if (StringUtils.isBlank(token) || Objects.isNull(userDetails)) {
             return false;
@@ -67,22 +56,10 @@ public class JwtTokenService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    /**
-     *
-     * @param token
-     * @return
-     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     *
-     * @param token
-     * @param claimsResolver
-     * @return
-     * @param <T>
-     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
