@@ -3,3 +3,4 @@ buildHub.sh
 /target/
 /.idea/
 /docker/db/
+/setJava.sh

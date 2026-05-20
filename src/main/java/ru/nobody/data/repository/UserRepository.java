@@ -1,8 +1,8 @@
-package ru.nobody.auth.data.repository;
+package ru.nobody.data.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.nobody.auth.data.entity.User;
+import ru.nobody.data.entity.User;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -1,9 +1,10 @@
+logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 spring:
   liquibase:
     enabled: true
     change-log: classpath:liquibase/master.xml
   jpa:
-    show-sql: false
+    show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none

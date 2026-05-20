@@ -1,9 +1,11 @@
 package ru.nobody.auth.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -15,6 +17,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.nobody.auth.config.filter.HttpOnlyCookieAuthenticationFilter;
+import ru.nobody.auth.services.AuthenticationService;
+
+import java.util.Enumeration;
+import java.util.Iterator;
 
 @Slf4j
 @Configuration
@@ -23,8 +29,12 @@ import ru.nobody.auth.config.filter.HttpOnlyCookieAuthenticationFilter;
 @RequiredArgsConstructor
 public class SecurityFilterConfig {
 
-    private static final String[] WHITE_LIST_URL = {
-            "login"
+    public static final String[] WHITE_LIST_URL = {
+            "/v1/auth"
+    };
+
+    public static final String[] WHITE_LIST_URL_PATTERNS = {
+            "/v1/auth/**"
     };
 
     private final HttpOnlyCookieAuthenticationFilter httpOnlyCookieAuthenticationFilter;
@@ -32,27 +42,48 @@ public class SecurityFilterConfig {
     private final DaoAuthenticationProvider daoAuthenticationProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationService authenticationService) throws Exception {
         return http
                 .headers(headersConfigurer -> headersConfigurer.frameOptions(Customizer.withDefaults()).disable())
-                .cors(AbstractHttpConfigurer::disable) // TODO
+                .cors(Customizer.withDefaults()) // TODO
                 .csrf(AbstractHttpConfigurer::disable) // TODO
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(WHITE_LIST_URL)
+                        .requestMatchers("**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(sessionConfigurer ->
                         sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .logout(customer -> customer
+                        .permitAll()
+                        .logoutSuccessHandler((req, response, auth) -> {
+                            authenticationService.logoutUser(response);
+                            // TODO Разорбатиься почему спринг сам не прокидвает эти заголовки
+                            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, getHeader(req, HttpHeaders.ORIGIN));
+                            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS , "true");
+                            response.setStatus(HttpStatus.OK.value());
+                            response.getWriter().flush();
+                        })
+                )
+//                        .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))))
                 .authenticationProvider(daoAuthenticationProvider)
                 .addFilterBefore(httpOnlyCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint((request, response, authException) -> {
                             log.error("Этой ошиби не должно быть", authException);
-                            // TODO just bad response with HTTP code
-                            response.setStatus(HttpStatus.FOUND.value());
-                            response.setHeader("Location", "/login");
+//                            // TODO just bad response with HTTP code
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         }))
                 .build();
     }
+
+    private String getHeader(HttpServletRequest request, String header ) {
+        Enumeration<String> headers = request.getHeaders(header);
+        Iterator<String> stringIterator = headers.asIterator();
+        if (stringIterator.hasNext()) {
+            return stringIterator.next();
+        }
+        return null;
+    }
+
 }

@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,8 +20,13 @@ import ru.nobody.auth.services.AccessTokenCookieService;
 import ru.nobody.auth.services.JwtTokenService;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static ru.nobody.auth.config.SecurityFilterConfig.WHITE_LIST_URL;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +46,8 @@ public class HttpOnlyCookieAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         // TODO whiteList
-        if (request.getServletPath().startsWith("/me") && Objects.nonNull(request.getCookies())) {
+
+        if (Objects.nonNull(request.getCookies()) || !inWhiteList(request)) {
             Optional<Cookie> accessTokenCookie = accessTokenCookieService.getAccessTokenCookie(request);
 
             accessTokenCookie.map(Cookie::getValue)
@@ -79,6 +86,27 @@ public class HttpOnlyCookieAuthenticationFilter extends OncePerRequestFilter {
                     }, SecurityContextHolder::clearContext);
         }
 
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, getHeader(request, HttpHeaders.ORIGIN));
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS , "true");
         filterChain.doFilter(request, response);
+
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, getHeader(request, HttpHeaders.ORIGIN));
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS , "true");
+//        response.setStatus(HttpStatus.OK.value());
+//        response.getWriter().flush();
+    }
+
+    private boolean inWhiteList(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return Stream.of(WHITE_LIST_URL).anyMatch(path::startsWith);
+    }
+
+    private String getHeader(HttpServletRequest request, String header ) {
+        Enumeration<String> headers = request.getHeaders(header);
+        Iterator<String> stringIterator = headers.asIterator();
+        if (stringIterator.hasNext()) {
+            return stringIterator.next();
+        }
+        return null;
     }
 }

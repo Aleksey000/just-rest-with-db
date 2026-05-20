@@ -7,9 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-import ru.nobody.auth.data.entity.User;
-import ru.nobody.auth.data.enums.Role;
-import ru.nobody.auth.data.repository.UserRepository;
+import ru.nobody.data.entity.User;
+import ru.nobody.data.enums.Role;
+import ru.nobody.data.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

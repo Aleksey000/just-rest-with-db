@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import ru.nobody.auth.data.enums.Role;
 import ru.nobody.data.entity.DbData;
 import ru.nobody.data.repository.TestRepository;
 
@@ -18,14 +17,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
+@RequestMapping("/v1/data")
 public class TestController {
 
     @Setter(onMethod = @__({@Autowired}))
     private TestRepository testRepository;
-
-
-
-
 
 
     @PostMapping("/put")
@@ -128,12 +124,5 @@ public class TestController {
         private String item;
     }
 
-    @Data
-    @Builder
-    public static class UserMeInfo {
-        private UUID id;
-        private String name;
-        private String email;
-        private Role role;
-    }
+
 }

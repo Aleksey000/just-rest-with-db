@@ -1,11 +1,11 @@
-package ru.nobody.auth.data.entity;
+package ru.nobody.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.nobody.auth.data.enums.Role;
+import ru.nobody.data.enums.Role;
 
 import java.util.Collection;
 import java.util.List;

@@ -28,4 +28,22 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="2026-04-22-init-3" author="mr_element">
+        <createTable tableName="projects">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+            </column>
+        </createTable>
+        <createTable tableName="project_member">
+<!--            <column name="id" type="UUID">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+            <column name="user_id" type="UUID">
+            </column>
+            <column name="project_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

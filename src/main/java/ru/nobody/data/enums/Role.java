@@ -1,4 +1,4 @@
-package ru.nobody.auth.data.enums;
+package ru.nobody.data.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 
